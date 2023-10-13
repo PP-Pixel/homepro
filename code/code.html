@@ -1,0 +1,133 @@
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>code</title>
+    </head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap');
+    </style>
+    <style>
+        code {
+            font-family: 'Source Code Pro', monospace;
+            line-height: 0.8;
+        }
+    </style>
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+    <body oncontextmenu="return false;">
+        <pre><code class="prettyprint">
+#include &lt;Servo.h&gt;<br>
+#include &lt;Wire.h&gt;<br>
+#include &lt;VL53L0X.h&gt;<br>
+<br>
+VL53L0X sensor;<br>
+Servo myservo;<br>
+<br>
+void setup()<br>
+{<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;// サーボ設定<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;myservo.attach(9);<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;myservo.write(90);<br>
+<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;// LEDピンの設定<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;pinMode(8, OUTPUT);<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;digitalWrite(8, LOW);<br>
+<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;// 距離センサーの初期設定<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;Serial.begin(9600);<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;Wire.begin();<br>
+<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;sensor.setTimeout(500);<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;if (!sensor.init())<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;{<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Serial.println("Failed to detect and initialize sensor!");<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while (1)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{}<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+<br>
+// スイッチをOFFにする<br>
+void SwOff()<br>
+{<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;myservo.write(90); // 元の角度に戻す<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;delay(500);<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;myservo.write(140); // ここで動かす角度を調整<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;delay(500);<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;.write(90); // 元の角度に戻す<br>
+}<br>
+<br>
+// スイッチをONにする<br>
+void SwOn()<br>
+{<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;myservo.write(90); // 元の角度に戻す<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;delay(500);<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;myservo.write(60); // ここで動かす角度を調整<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;delay(500);<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;myservo.write(90); // 元の角度に戻す<br>
+}<br>
+<br>
+// 距離を測定する<br>
+bool CheckDistance()<br>
+{<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;int distance;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;distance = sensor.readRangeSingleMillimeters();<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;Serial.println(distance);<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;if ((50 &lt; distance) &amp;&amp; (distance &lt; 110))<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;{ // 5cm以上11cm未満で動かす<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return true;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;return false;<br>
+}<br>
+<br>
+void loop()<br>
+{<br>
+    <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;bool sw_onoff = false;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;int count = 0;<br>
+    <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;// はじめに電源OFFする<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;SwOff();<br>
+    <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;// ずっと回るループ<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;while (1)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;{<br>
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 距離を測定し、設定範囲だったらカウントアップ、範囲外なら0にする<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (CheckDistance())<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count++;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;digitalWrite(8, HIGH); // LEDを点灯<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count = 0;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;digitalWrite(8, LOW); // LEDを消灯<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 10回連続で距離が設定範囲だったとき<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (count == 10)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 現在スイッチOFFの場合<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (sw_onoff == false)<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sw_onoff = true; // スイッチON状態を記憶<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SwOn();          // サーボモータをONの制御<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 現在スイッチONの場合<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sw_onoff = false; // スイッチOFF状態を記憶<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SwOff();          // サーボモータをOFFの制御<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 動作後は、カウントを0にする<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count = 0;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;// 0.1秒待つ（ループが回る速さを制限する）<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;delay(100);<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</code></pre>
+    </body>
+</html>
