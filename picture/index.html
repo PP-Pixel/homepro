@@ -1,59 +1,86 @@
 <!-- <model-viewer>を使って、3Dを、WEBサイトに埋め込む例 -->
-    <!DOCTYPE html>
-    <html>
-    
-    <head>
-        <meta name="robots" content="noindex">
-        <meta charset="UTF-8">
-        <link rel="icon" type="image/png" href="https://pp-pixel.github.io/homepro/favicon.png">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>写真</title>
-    </head>
-    
-    <body>
-        <link rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" />
-        <!-- CSSで表示サイズや、背景色を指定する -->
-        <style>
-            .top a {
-                display: block;
-                text-decoration: none;
-                text-align: center;
-                z-index: 99;
-                position: fixed;
-                right: 10px;
-                bottom: 10px;
-                color: #ff7700;
-                /* background: #ff7700; */
-                width: 60px;
-                height: 60px;
-                line-height: 60px;
-                border-radius: 20px;
-            }
-            body {
-                text-align: center;
-            }
-            img {
-                width: 70%;
-                height: auto;
-                margin-top: 10px;
-                margin-left: 30%;
-                margin-right: 30%;
-                margin: auto;
-                border-radius: 20px;
-            }
-        </style>
-        <img src="3d.png"><br>
-        <a>Image1</a><br><br>
-        <img src="3d.png"><br>
-        <a>Image2</a><br><br>
-        <div class="top">
-            <a href="javascript:history.back()" onselectstart="return false;" onmousedown="return false;" />
-            <span class="material-symbols-outlined">
-                home
-            </span>
-            </a>
-        </div>
-    </body>
-    
-    </html>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="robots" content="noindex">
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="https://pp-pixel.github.io/homepro/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>写真</title>
+</head>
+
+<body oncontextmenu="return false;">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" />
+    <!-- CSSで表示サイズや、背景色を指定する -->
+    <style>
+        .top a {
+            display: block;
+            text-decoration: none;
+            text-align: center;
+            z-index: 99;
+            position: fixed;
+            right: 10px;
+            bottom: 10px;
+            color: #ff7700;
+            /* background: #ff7700; */
+            width: 60px;
+            height: 60px;
+            line-height: 60px;
+            border-radius: 20px;
+        }
+
+        body {
+            text-align: center;
+        }
+
+        img {
+            width: 45%;
+            height: auto;
+            margin-top: 10px;
+            margin-left: 30%;
+            margin-right: 30%;
+            margin: auto;
+            border-radius: 20px;
+        }
+
+        video {
+            width: 45%;
+            height: auto;
+            margin-top: 10px;
+            margin-left: 30%;
+            margin-right: 30%;
+            margin: auto;
+            border-radius: 20px;
+        }
+
+        .image a {
+            color: black;
+            text-decoration: none;
+        }
+
+        .image {
+            cursor: default;
+        }
+    </style>
+    <div class="image">
+        <img src="PXL_KIBAN1.jpg" style="margin-top: 20px;"><br>
+        <a>基板(Arduino)</a><br><br>
+        <img src="PXL_HONTA1.jpg"><br>
+        <a href="https://pp-pixel.github.io/homepro/switch-mini/" target="_blank">作ったもの</a><br><br>
+        <img src="PXL_HONTA2.jpg"><br>
+        <a href="https://pp-pixel.github.io/homepro/switch-mini/" target="_blank">サーボモーター部分</a><br><br>
+        <video controls src="PXL_DOUSA.mp4"></video><br>
+        <a>動作</a><br><br>
+    </div>
+    <div class="top">
+        <a href="javascript:history.back()" onselectstart="return false;" onmousedown="return false;" />
+        <span class="material-symbols-outlined">
+            home
+        </span>
+        </a>
+    </div>
+</body>
+
+</html>
